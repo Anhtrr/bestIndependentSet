@@ -1,70 +1,69 @@
-package iterativeDeepening;
+package hillClimbing;
 
 import java.util.List;
 import java.io.FileNotFoundException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.*;
-import java.util.NoSuchElementException;
 import java.util.Scanner;
-import java.util.List;
-import java.util.ArrayList;
-import java.util.Arrays;
 
-
-public class iddfs {
+public class Graph {
     public static void main(String args[]){
         // data structure to construct graph and vertex
         HashMap<Character, List<Character>> graph = new HashMap<>();
         HashMap<Character, Integer> vertices = new HashMap<>();
         // store command
-        String[] commandInfo = new String[]{"", ""};
-        String flag = null;
+        String[] commandInfo = new String[]{"","",""};
+        String flag = "";
         int targetValue = 0;
-
+        int restarts = 0;
         try{
             // EXTRACT INPUT
             readInput(graph, vertices, commandInfo);
             flag = commandInfo[0];
             targetValue = Integer.parseInt(commandInfo[1]);
-        
+            restarts = Integer.parseInt(commandInfo[2]);
+
             System.out.println(flag);
             System.out.println(targetValue);
+            System.out.println(restarts);
             System.out.println(graph);
             System.out.println(vertices);
 
         } catch (FileNotFoundException e){
-            System.err.println("Here1");
+            System.err.println("File input.txt was not found!" + 
+            " Please make sure it is in the same folder as the source code" +
+            " and that you are running the source code from this" +
+            " 'iterativeDeepening' folder in your terminal!");
             System.exit(0);
         }
 
         // Verbose Option
-        if (flag.equals("V")){
-            verbose(graph, vertices, targetValue);
-        }
+        //if (flag.equals("V")){
+            //verbose(graph, vertices, targetValue);
+        //}
         // Compact Option
-        else if(flag.equals("C")){
-            compact(graph, vertices, targetValue);
-        }
+        //else if(flag.equals("C")){
+            //compact(graph, vertices, targetValue);
+        //}
     }
     
+    // EXTRACT INPUT AND CONSTRUCT GRAPH
     public static void readInput(HashMap<Character, List<Character>> graph, 
     HashMap<Character, Integer> vertices, String[] commandInfo) throws FileNotFoundException{
         // construct default empty graph 
         List<Character> allVertices = new ArrayList<>();
-        File graphFile = new File("iterativeDeepening/input.txt");
+        File graphFile = new File("input.txt");
         try{
             // 1) Extract command print style and targetValue
             Scanner inFile = new Scanner(graphFile);
             String firstLine = inFile.nextLine().trim();
+            String restartString = firstLine.split(" ", -1)[2];
             String typeOfResult = firstLine.split(" ", -1)[1];
             String targetString = firstLine.split(" ", -1)[0];
             commandInfo[0] = typeOfResult;
             commandInfo[1] = targetString;
+            commandInfo[2] = restartString;
             // 2) Add vertices to vertices list and graph
             while (inFile.hasNextLine()){
                 String currentLine = inFile.nextLine().trim();
@@ -102,70 +101,111 @@ public class iddfs {
             }
             inFile.close();
         } catch (FileNotFoundException e) {
-            System.err.println("Here3");
+            System.err.println("File input.txt was not found!" + 
+            " Please make sure it is in the same folder as the source code" +
+            " and that you are running the source code from this" +
+            " 'iterativeDeepening' folder in your terminal!");
             System.exit(0);
         }
         return;
     }
 
-
-    // ACTUAL ALGO
+    // VERBOSE PRINTING
     public static void verbose(HashMap<Character, List<Character>> graph, 
     HashMap<Character, Integer> vertices, int goal){   
-        // depth is bounded by n (for n vertices)
+        // depth is bounded by n (for n vertices) - From hwk
         int maximalDepth = vertices.size();
-        // loop through each depth
-        for (int currentDepth = 0; currentDepth <= maximalDepth; currentDepth++){
+        boolean foundSolution = false;
+        // loop through each depth (skip 0 --> based on sample output)
+        for (int currentDepth = 1; currentDepth <= maximalDepth; currentDepth++){
             // print depth level
             System.out.println("\nDepth=" + currentDepth + ".");
             String answer = "";
-            answer = dfs(graph, vertices, goal, currentDepth);
+            answer = dfs( answer, graph, vertices, goal, currentDepth, 'V');
             // IF SOLUTION FOUND
             if(calcValue(vertices, answer)>=goal){
-                System.out.println("\nFound solution " + answer);
-                System.out.println(calcValue(vertices, answer));
+                // format print
+                String formatAnswer = formatStateForPrint(answer);
+                String formatAnswerLine = formatAnswer + "Value=" 
+                + calcValue(vertices, answer) + ".";
+                System.out.println("\nFound solution " + formatAnswerLine + "\n");
+                foundSolution = true;
                 break;
             }
-            
+        }
+        // NO SOLUTION FOUND
+        if (foundSolution == false){
+            System.out.println("\nNo solution found\n");
         }
         return;   
     }
 
-    public static String dfs(HashMap<Character, List<Character>> graph, 
-    HashMap<Character, Integer> vertices, int goal, int maxDepth){
-        String state = "";
-        return dfs1(state, graph, vertices, goal, maxDepth);
+    // COMPACT PRINTING
+    public static void compact(HashMap<Character, List<Character>> graph, HashMap<Character, Integer> vertices, int goal){
+        // depth is bounded by n (for n vertices) - From hwk
+        int maximalDepth = vertices.size();
+        boolean foundSolution = false;
+        // loop through each depth (skip 0 --> based on sample output)
+        for (int currentDepth = 1; currentDepth <= maximalDepth; currentDepth++){
+            // store answer
+            String answer = "";
+            answer = dfs( answer, graph, vertices, goal, currentDepth, 'C');
+            // IF SOLUTION FOUND
+            if(calcValue(vertices, answer)>=goal){
+                // format print
+                String formatAnswer = formatStateForPrint(answer);
+                String formatAnswerLine = formatAnswer + "Value=" 
+                + calcValue(vertices, answer) + ".";
+                System.out.println("\nFound solution " + formatAnswerLine + "\n");
+                foundSolution = true;
+                break;
+            }
+        }
+        // NO SOLUTION FOUND
+        if (foundSolution == false){
+            System.out.println("\nNo solution found\n");
+        }
+        return;
     }
-    public static String dfs1(String state, HashMap<Character, List<Character>> graph, 
-    HashMap<Character, Integer> vertices, int goal, int maxDepth){
-        //System.out.println("state: " + state);
+
+    // DFS ALGO
+    public static String dfs(String state, HashMap<Character, List<Character>> graph, 
+    HashMap<Character, Integer> vertices, int goal, int maxDepth, Character flag){
         // BC1 - check for goal state
         if(calcValue(vertices, state)>= goal){
             return state;
         }
-
-        // find successors to state exactly once
+        // find successors to current state for # of depths iterations
         for (int i = 0; i < maxDepth; i++){
             List<String> successors = new ArrayList<>();
             successors = getSuccessors(state, graph);
             // BC2 - if no successors
             if (successors.size() == 0){
-                System.out.println(state);
-                return state;
+                return null;
             }
             for (String successor : successors){
-                System.out.println(successor);
+                // if verbose printing declared - print out every successor found
+                if (flag.equals('V')){
+                    String formatState = formatStateForPrint(successor);
+                    String formatStateLine = formatState + "Value=" 
+                    + calcValue(vertices, successor) + ".";
+                    System.out.println(formatStateLine);
+                }
                 //dfs1(successor)
-                String ans = dfs1(successor, graph, vertices, goal, maxDepth-1);
+                String ans = dfs(successor, graph, vertices, goal, maxDepth-1, flag);
                 // if ans meets goal
                 if (calcValue(vertices, ans) >= goal){
                     return ans;
                 }
             }
+            // FAIL
+            return null;
         }
-        return state;
+        // FAIL
+        return null;
     }
 
+    // HELPER 1 - return a list of successors
     public static List<String> getSuccessors(String state, HashMap<Character, List<Character>> graph){
         List<String> successors = new ArrayList<>();
         // if starting state
@@ -188,12 +228,12 @@ public class iddfs {
                 }
             }
         }
-        
         return successors;
     }
 
+    // HELPER 2 - calculate value of state
     public static int calcValue(HashMap<Character, Integer> vertices, String state){
-        if(state.equals(null)){
+        if(state == null){
             return 0;
         }
         if(state.length() == 0 || state == ""){
@@ -209,20 +249,13 @@ public class iddfs {
         }
     }
 
+    // HELPER 3 - format a state (string) for printing
     public static String formatStateForPrint(String state){
         String formatState = "";
         for (int i = 0; i < state.length(); i++){
-            if(i == state.length()-1){
-                formatState += state.charAt(i);
-            }
-            else{
-                formatState += state.charAt(i) + " ";
-            }
+            formatState += state.charAt(i) + " ";
         }
         return formatState;
     }
 
-    public static void compact(HashMap<Character, List<Character>> graph, HashMap<Character, Integer> vertices, int goal){
-
-    }
 }
