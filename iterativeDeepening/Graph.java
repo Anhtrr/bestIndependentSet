@@ -161,6 +161,12 @@ public class Graph {
     // DFS ALGO
     public static String dfs(String state, HashMap<Character, List<Character>> graph, 
     HashMap<Character, Integer> vertices, int goal, int maxDepth, Character flag){
+        // if verbose printing declared - print out each state
+        if (flag.equals('V') && state.length() > 0){
+            String formatState = formatStateForPrint(state);
+            String formatStateLine = formatState + "Value=" + calcValue(vertices, state) + ".";
+            System.out.println(formatStateLine);
+        }
         // BC1 - check for goal state
         if(calcValue(vertices, state)>= goal){
             return state;
@@ -174,13 +180,6 @@ public class Graph {
                 return null;
             }
             for (String successor : successors){
-                // if verbose printing declared - print out every successor found
-                if (flag.equals('V')){
-                    String formatState = formatStateForPrint(successor);
-                    String formatStateLine = formatState + "Value=" 
-                    + calcValue(vertices, successor) + ".";
-                    System.out.println(formatStateLine);
-                }
                 //dfs1(successor)
                 String ans = dfs(successor, graph, vertices, goal, maxDepth-1, flag);
                 // if ans meets goal
