@@ -18,7 +18,7 @@
          
                 
 ### ✔️ Compiling/Running Instructions                   
-
+<br>
 ####    1)   Iterative Deepening                    
 
 <p align="left"> 
@@ -31,6 +31,24 @@ javac Graph.java
                     
 <p align="left"> 
 Make sure that 'Graph.java' has compiled successfully (There now exists a 'Graph.class' file in 'iterativeDeepening' folder) and make sure that 'input.txt' is also in the 'iterativeDeepening' folder. Then, to RUN:
+</p> 
+                       
+```
+java Graph.java
+```
+<br>
+####    1)   Hill Climbing                    
+
+<p align="left"> 
+Make sure that in your terminal you have navigated to the 'hillClimbing' folder. Then, to COMPILE:
+</p> 
+                
+```
+javac Graph.java
+```
+                    
+<p align="left"> 
+Make sure that 'Graph.java' has compiled successfully (There now exists a 'Graph.class' file in 'hillClimbing' folder) and make sure that 'input.txt' is also in the 'hillClimbing' folder. Then, to RUN:
 </p> 
                        
 ```
