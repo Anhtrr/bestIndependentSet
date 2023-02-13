@@ -8,48 +8,51 @@
                
 ### ⚙️ Folder Structure
 <pre align="left">             
-📁bestIndependentSet📁 ---> 📁hillClimbing📁 ---> 🗀Graph.java🗀      <br>
-                         |                      |                       <br>
-                         |                      --> 🗀input.txt🗀       <br>
-                         |                                              <br>
-                         --> 📁iterativeDeepening📁 ---> 🗀Graph.java🗀<br>
-                                                      |                 <br>
-                                                      --> 🗀input.txt🗀 <br>
+📁bestIndependentSet📁 ---> 📁hillClimbing📁 ---> 🗀hillClimbing.java🗀            <br>
+                         |                      |                                    <br>
+                         |                      --> 🗀input.txt🗀                    <br>
+                         |                                                           <br>
+                         --> 📁iterativeDeepening📁 ---> 🗀iterativeDeepening.java🗀<br>
+                                                      |                              <br>
+                                                      --> 🗀input.txt🗀              <br>
 </pre>   
          
                 
 ### ✔️ Compiling/Running Instructions                   
 
+                   
 ####    1)   Iterative Deepening                    
 
                 
-Make sure that in your terminal you have navigated to the 'iterativeDeepening' folder. Then, to COMPILE:
+- To COMPILE:
                   
                 
 ```
-javac Graph.java
+javac iterativeDeepening.java
 ```
                     
                   
-Make sure that 'Graph.java' has compiled successfully (There now exists a 'Graph.class' file in 'iterativeDeepening' folder) and make sure that 'input.txt' is also in the 'iterativeDeepening' folder. Then, to RUN:
+- Make sure 'input.txt' file is in the same directory as the 'iterativeDeepening.java' file and make sure that it follows the command format for the Iterative Deepening Version, as stated in the assignment page. Then, to RUN:
                    
                        
 ```
-java Graph.java
+java iterativeDeepening.java
 ```
-                        
+
+
+                                                   
 ####    2)   Hill Climbing                    
 
                
-Make sure that in your terminal you have navigated to the 'hillClimbing' folder. Then, to COMPILE:
+- To COMPILE:
                 
                 
 ```
-javac Graph.java
+javac hillClimbing.java
 ```
                     
               
-Make sure that 'Graph.java' has compiled successfully (There now exists a 'Graph.class' file in 'hillClimbing' folder) and make sure that 'input.txt' is also in the 'hillClimbing' folder. Then, to RUN:
+- Make sure 'input.txt' file is in the same directory as the 'hillClimbing.java' file and make sure that it follows the command format for the Hill Climbing Version, as stated in the assignment page. Then, to RUN: 
                      
                        
 ```

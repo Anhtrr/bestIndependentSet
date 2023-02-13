@@ -1,5 +1,3 @@
-package iterativeDeepening;
-
 import java.util.List;
 import java.io.FileNotFoundException;
 import java.util.ArrayList;
@@ -15,7 +13,7 @@ import java.util.Scanner;
  *  Due: 2/13/2023 - 11AM (EST)
  *  
  */
-public class Graph {
+public class iterativeDeepening {
     public static void main(String args[]){
         // data structure to construct graph and vertex
         HashMap<Character, List<Character>> graph = new HashMap<>();

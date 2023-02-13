@@ -1,5 +1,3 @@
-package hillClimbing;
-
 import java.util.List;
 import java.io.FileNotFoundException;
 import java.util.ArrayList;
@@ -18,7 +16,7 @@ import java.lang.Math;
  *  Due: 2/13/2023 - 11AM (EST)
  *  
  */
-public class Graph {
+public class hillClimbing {
     public static void main(String args[]){
         // data structure to construct graph and vertex
         HashMap<Character, List<Character>> graph = new HashMap<>();
@@ -61,12 +59,19 @@ public class Graph {
             // 1) Extract command print style and targetValue
             Scanner inFile = new Scanner(graphFile);
             String firstLine = inFile.nextLine().trim();
-            String restartString = firstLine.split(" ", -1)[2];
-            String typeOfResult = firstLine.split(" ", -1)[1];
-            String targetString = firstLine.split(" ", -1)[0];
-            commandInfo[0] = typeOfResult;
-            commandInfo[1] = targetString;
-            commandInfo[2] = restartString;
+            try{
+                String restartString = firstLine.split(" ", -1)[2];
+                String typeOfResult = firstLine.split(" ", -1)[1];
+                String targetString = firstLine.split(" ", -1)[0];
+                commandInfo[0] = typeOfResult;
+                commandInfo[1] = targetString;
+                commandInfo[2] = restartString;
+            } catch(ArrayIndexOutOfBoundsException e){
+                System.err.println("First Line in input.txt is " +
+                "not correct! This is Hill Climbing, not Iterative "
+                + "Deepening! Please make sure it is correct!");
+                System.exit(0);
+            }          
             // 2) Add vertices to vertices list and graph
             while (inFile.hasNextLine()){
                 String currentLine = inFile.nextLine().trim();
