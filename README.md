@@ -3,11 +3,12 @@
 Student: Anh Tran 
                   
 ## ⚙️ Best Independent Set Assignment
-             
-.     📁bestIndependentSet📁 ---> 📁hillClimbing📁 ---> 🗀Graph.java🗀           .<br>
-.                              |                      |                            .<br>
-.                              |                      --> 🗀input.txt🗀            .<br>
-.                              |                                                   .<br>
-.                              --> 📁iterativeDeepening📁 ---> 🗀Graph.java🗀     .<br>
-.                                                           |                      .<br>
-.                                                           --> 🗀input.txt🗀      .<br>
+<pre align="center">             
+📁bestIndependentSet📁 ---> 📁hillClimbing📁 ---> 🗀Graph.java🗀      <br>
+                         |                      |                       <br>
+                         |                      --> 🗀input.txt🗀       <br>
+                         |                                              <br>
+                         --> 📁iterativeDeepening📁 ---> 🗀Graph.java🗀<br>
+                                                      |                 <br>
+                                                      --> 🗀input.txt🗀 <br>
+</pre>   
