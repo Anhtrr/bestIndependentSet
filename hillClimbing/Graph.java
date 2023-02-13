@@ -3,9 +3,12 @@ package hillClimbing;
 import java.util.List;
 import java.io.FileNotFoundException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.io.File;
 import java.util.Scanner;
+import java.lang.Math;
 
 public class Graph {
     public static void main(String args[]){
@@ -22,37 +25,30 @@ public class Graph {
             readInput(graph, vertices, commandInfo);
             flag = commandInfo[0];
             targetValue = Integer.parseInt(commandInfo[1]);
-            restarts = Integer.parseInt(commandInfo[2]);
-
-            System.out.println(flag);
-            System.out.println(targetValue);
-            System.out.println(restarts);
-            System.out.println(graph);
-            System.out.println(vertices);
+            restarts = Integer.parseInt(commandInfo[2]);      
 
         } catch (FileNotFoundException e){
             System.err.println("File input.txt was not found!" + 
             " Please make sure it is in the same folder as the source code" +
             " and that you are running the source code from this" +
-            " 'iterativeDeepening' folder in your terminal!");
+            " 'hillClimbing' folder in your terminal!");
             System.exit(0);
         }
 
         // Verbose Option
-        //if (flag.equals("V")){
-            //verbose(graph, vertices, targetValue);
-        //}
+        if (flag.equals("V")){
+            verbose(graph, vertices, targetValue, restarts);
+        }
         // Compact Option
-        //else if(flag.equals("C")){
-            //compact(graph, vertices, targetValue);
-        //}
+        else if(flag.equals("C")){
+            compact(graph, vertices, targetValue, restarts);
+        }
     }
     
     // EXTRACT INPUT AND CONSTRUCT GRAPH
     public static void readInput(HashMap<Character, List<Character>> graph, 
     HashMap<Character, Integer> vertices, String[] commandInfo) throws FileNotFoundException{
         // construct default empty graph 
-        List<Character> allVertices = new ArrayList<>();
         File graphFile = new File("input.txt");
         try{
             // 1) Extract command print style and targetValue
@@ -78,17 +74,8 @@ public class Graph {
                 vertices.put(label, value);
                 // add vertex to graph
                 graph.put(label, adjList);
-                allVertices.add(label);
             }
-            // 3) Add all vertices to each vertex adj list
-            for (Character c : graph.keySet()){
-                for (Character a : allVertices){
-                    if (!a.equals(c)){
-                        graph.get(c).add(a);
-                    }
-                }
-            }
-            // 4) Read edges and remove ones with edges from adj list
+            // 3) Read edges and add edges to adj list of both vertices(bi directional)
             while (inFile.hasNextLine()){
                 String currentLine = inFile.nextLine().trim();
                 if (currentLine.equals("")){
@@ -96,15 +83,15 @@ public class Graph {
                 }
                 Character vertex1 = currentLine.split(" ", -1)[0].charAt(0);
                 Character vertex2 = currentLine.split(" ", -1)[1].charAt(0);
-                graph.get(vertex1).remove(vertex2);
-                graph.get(vertex2).remove(vertex1);
+                graph.get(vertex1).add(vertex2);
+                graph.get(vertex2).add(vertex1);
             }
             inFile.close();
         } catch (FileNotFoundException e) {
             System.err.println("File input.txt was not found!" + 
             " Please make sure it is in the same folder as the source code" +
             " and that you are running the source code from this" +
-            " 'iterativeDeepening' folder in your terminal!");
+            " 'hillClimbing' folder in your terminal!");
             System.exit(0);
         }
         return;
@@ -112,126 +99,292 @@ public class Graph {
 
     // VERBOSE PRINTING
     public static void verbose(HashMap<Character, List<Character>> graph, 
-    HashMap<Character, Integer> vertices, int goal){   
-        // depth is bounded by n (for n vertices) - From hwk
-        int maximalDepth = vertices.size();
-        boolean foundSolution = false;
-        // loop through each depth (skip 0 --> based on sample output)
-        for (int currentDepth = 1; currentDepth <= maximalDepth; currentDepth++){
-            // print depth level
-            System.out.println("\nDepth=" + currentDepth + ".");
-            String answer = "";
-            answer = dfs( answer, graph, vertices, goal, currentDepth, 'V');
-            // IF SOLUTION FOUND
-            if(calcValue(vertices, answer)>=goal){
-                // format print
-                String formatAnswer = formatStateForPrint(answer);
-                String formatAnswerLine = formatAnswer + "Value=" 
-                + calcValue(vertices, answer) + ".";
-                System.out.println("\nFound solution " + formatAnswerLine + "\n");
-                foundSolution = true;
+    HashMap<Character, Integer> vertices, int goal, int randomCount){   
+        // Iterate for a user-specified max number of times
+        for (int i = 0 ; i < randomCount; i++){
+            String randomState = "";
+            randomState = getRandomState(vertices);
+            
+            // START STATE FORMATTING 
+            String formatStartState = formatStateForPrint(randomState);
+            int startValue = calcValue(vertices, randomState);
+            int startError = calcError(graph, vertices, randomState, goal);
+            String formatStartLine = formatStartState + "Value=" + startValue 
+            + ". " + "Error=" + startError + ".";
+            
+            // PRINT START STATES
+            System.out.println("\nRandomly chosen start state: " + 
+            formatStartState.trim());
+            System.out.println(formatStartLine);
+            
+            String ans = hc(graph, vertices, goal, randomCount, randomState, 'V');
+            // if error value = 0
+            int finalError = calcError(graph, vertices, ans, goal);
+            if(finalError == 0){
+                String formatAnswer = formatStateForPrint(ans);
+                String formatAnswerLine = formatAnswer + "Value=" ;
+                int answerValue = calcValue(vertices, ans);
+                System.out.println("\nFound solution " + formatAnswerLine + answerValue + ".");
                 break;
             }
-        }
-        // NO SOLUTION FOUND
-        if (foundSolution == false){
-            System.out.println("\nNo solution found\n");
+            else{
+                System.out.println("\nSearch failed");
+                continue;
+            }
         }
         return;   
     }
 
     // COMPACT PRINTING
-    public static void compact(HashMap<Character, List<Character>> graph, HashMap<Character, Integer> vertices, int goal){
-        // depth is bounded by n (for n vertices) - From hwk
-        int maximalDepth = vertices.size();
-        boolean foundSolution = false;
-        // loop through each depth (skip 0 --> based on sample output)
-        for (int currentDepth = 1; currentDepth <= maximalDepth; currentDepth++){
-            // store answer
-            String answer = "";
-            answer = dfs( answer, graph, vertices, goal, currentDepth, 'C');
-            // IF SOLUTION FOUND
-            if(calcValue(vertices, answer)>=goal){
-                // format print
-                String formatAnswer = formatStateForPrint(answer);
-                String formatAnswerLine = formatAnswer + "Value=" 
-                + calcValue(vertices, answer) + ".";
-                System.out.println("\nFound solution " + formatAnswerLine + "\n");
-                foundSolution = true;
+    public static void compact(HashMap<Character, List<Character>> graph, 
+    HashMap<Character, Integer> vertices, int goal, int randomCount){
+        // Iterate for a user-specified max number of times
+        for (int i = 0 ; i < randomCount; i++){
+            String randomState = "";
+            randomState = getRandomState(vertices);
+            
+            // START STATE FORMATTING 
+            String formatStartState = formatStateForPrint(randomState);
+            int startValue = calcValue(vertices, randomState);
+            int startError = calcError(graph, vertices, randomState, goal);
+            String formatStartLine = formatStartState + "Value=" + startValue 
+            + ". " + "Error=" + startError + ".";
+            
+            // PRINT START STATES
+            System.out.println("\nRandomly chosen start state: " + 
+            formatStartState.trim());
+            System.out.println(formatStartLine);
+            
+            String ans = hc(graph, vertices, goal, randomCount, randomState, 'C');
+            // if error value = 0
+            int finalError = calcError(graph, vertices, ans, goal);
+            if(finalError == 0){
+                String formatAnswer = formatStateForPrint(ans);
+                String formatAnswerLine = formatAnswer + "Value=" ;
+                int answerValue = calcValue(vertices, ans);
+                System.out.println("\nFound solution " + formatAnswerLine + answerValue + ".");
                 break;
             }
+            else{
+                System.out.println("\nSearch failed");
+                continue;
+            }
         }
-        // NO SOLUTION FOUND
-        if (foundSolution == false){
-            System.out.println("\nNo solution found\n");
-        }
-        return;
+        return; 
     }
 
-    // DFS ALGO
-    public static String dfs(String state, HashMap<Character, List<Character>> graph, 
-    HashMap<Character, Integer> vertices, int goal, int maxDepth, Character flag){
-        // BC1 - check for goal state
-        if(calcValue(vertices, state)>= goal){
-            return state;
-        }
-        // find successors to current state for # of depths iterations
-        for (int i = 0; i < maxDepth; i++){
-            List<String> successors = new ArrayList<>();
-            successors = getSuccessors(state, graph);
-            // BC2 - if no successors
-            if (successors.size() == 0){
-                return null;
-            }
-            for (String successor : successors){
-                // if verbose printing declared - print out every successor found
-                if (flag.equals('V')){
-                    String formatState = formatStateForPrint(successor);
-                    String formatStateLine = formatState + "Value=" 
-                    + calcValue(vertices, successor) + ".";
-                    System.out.println(formatStateLine);
+    // HILL CLIMBING ALGO
+    public static String hc(HashMap<Character, List<Character>> graph, 
+    HashMap<Character, Integer> vertices, int goal, int randomCount, 
+    String startingState, Character flag){
+        String state = new String(startingState);
+        
+        while (true){
+            List<String> neighbors = new ArrayList<>();
+            neighbors = getNeighbors(state, vertices);
+            
+            // choose optimal N out of all Ns based on error calculation
+            String chosenN = chooseN(graph, vertices, neighbors, goal);
+            int chosenError = calcError(graph, vertices, chosenN, goal);
+            int startingError = calcError(graph, vertices, state, goal);
+             
+            // Verbose printing
+            if(flag.equals('V')){
+                System.out.println("Neighbors:");
+                // loop through all neighbor collected
+                for (String neighbor : neighbors){
+                    // neighbor data
+                    String formatStartState = formatStateForPrint(neighbor);
+                    int startValue = calcValue(vertices, neighbor);
+                    int startError = calcError(graph, vertices, neighbor, goal);
+                    String formatPrintLine = formatStartState + "Value=" + startValue 
+                    + ". Error=" + startError + ".";
+                    // print neighbor
+                    System.out.println(formatPrintLine);
+
+                    if(startError == 0){
+                        return neighbor;
+                    }
                 }
-                //dfs1(successor)
-                String ans = dfs(successor, graph, vertices, goal, maxDepth-1, flag);
-                // if ans meets goal
-                if (calcValue(vertices, ans) >= goal){
-                    return ans;
-                }
+            } 
+            // BC - if chosen neighbor is not better than current state
+            if (chosenError >= startingError){
+                return state;
             }
-            // FAIL
-            return null;
+            state = chosenN;
+            // Verbose printing - if chosen neighbor is a better choice than original state
+            if(flag.equals('V')){
+                String formatNextState = formatStateForPrint(state).trim();
+                int nextStateValue = calcValue(vertices, state);
+                int nextStateError = calcError(graph, vertices, state, goal);
+                String formatNextPrintLine = "\nMove to " + formatNextState + 
+                ". Value=" + nextStateValue + ". Error=" + nextStateError + ".";
+                System.out.println(formatNextPrintLine);
+            }
+            if(chosenError == 0){
+                return state;
+            }
         }
-        // FAIL
-        return null;
     }
 
-    // HELPER 1 - return a list of successors
-    public static List<String> getSuccessors(String state, HashMap<Character, List<Character>> graph){
-        List<String> successors = new ArrayList<>();
-        // if starting state
-        if (state.length() == 0){
-            // for each vertex/state
-            for (Character c : graph.keySet()){
-                String singleV = c.toString();
-                successors.add(singleV);
+    // HELPER 1 - choose best Neighbor
+    public static String chooseN(HashMap<Character, List<Character>> graph,
+    HashMap<Character, Integer> vertices, List<String> neighbors, int goal){
+        List<Integer> errorValues = new ArrayList<>();
+        String chosen = "";
+        int chosenIndex = 0;
+        // calculate all error values
+        for (String neighbor : neighbors){
+            int errorValue = calcError(graph, vertices, neighbor, goal);
+            errorValues.add(errorValue);
+        }
+        // compare all errorValues
+        for (int i = 1; i < errorValues.size(); i++){
+            if(errorValues.get(i) < errorValues.get(chosenIndex)){
+                chosenIndex = i;
+            }
+            else{
+                continue;
             }
         }
-        // if not starting state
+        chosen = neighbors.get(chosenIndex);
+        return chosen;
+    }
+
+    // HELPER 2 - calculate error of a state/string
+    public static int calcError(HashMap<Character, List<Character>> graph, 
+    HashMap<Character, Integer> vertices, String state, int T){
+        // 1) TOTAL VALUE OF VERTICES IN STATE
+        int valueTotal = calcValue(vertices, state);
+        
+        // empty state
+        if(state.length() == 0){
+            return T;
+        }
+        // 1 vertex in state
+        else if(state.length() == 1){
+            return (T - vertices.get(state.charAt(0)));
+        }
+        // more than 1 vertex
+        else{       
+            // 2) COST OF EDGES
+            int edgeCostSum = 0;
+            // get all edges in state (no duplicates)
+            HashSet<String> edges = new HashSet<>();
+            char[] verticesInState = state.toCharArray();
+            for(int i = 0; i < verticesInState.length; i++){
+                for(int j = 0; j < verticesInState.length; j++){
+                    if(i == j){
+                        continue;
+                    }
+                    else{
+                        // no duplicate edges
+                        char[] edge = {verticesInState[i], verticesInState[j]};
+                        Arrays.sort(edge);
+                        
+                        if(isEdge(graph, new String(edge))){
+                            edges.add(new String(edge));
+                            
+                        }
+                    }
+                }
+            }
+            // for each edge in state 
+            for (String edge : edges){
+                int cost = calcEdgeCost(vertices, edge);
+                edgeCostSum += cost;
+            }
+
+            // 4) Compare to get max value
+            int cmpSum = T - valueTotal;
+            
+            
+            // 4) return max(cmpSum, 0)
+            if (cmpSum>0){
+                return cmpSum + edgeCostSum;
+            }
+            else{
+                return 0 + edgeCostSum;
+            }
+        }
+    }
+
+    // HELPER 3 - calculate the cost of an edge
+    public static int calcEdgeCost(HashMap<Character, Integer> vertices, String edge){
+        Character vertex1 = edge.charAt(0);
+        Character vertex2 = edge.charAt(1);
+        int cost1 = vertices.get(vertex1);
+        int cost2 = vertices.get(vertex2);
+        if(cost1<=cost2){
+            return cost1;
+        }
         else{
-            // for each vertex adjacent to current state's last vertex 
-            for(Character c : graph.get(state.charAt(state.length()-1))){
-                // if vertex isnt already in chain
-                if(!state.contains(c.toString().trim())){
-                    // add to successors
-                    String successor = state + c.toString().trim();
-                    successors.add(successor);
-                }
-            }
+            return cost2;
         }
-        return successors;
     }
 
-    // HELPER 2 - calculate value of state
+    // HELPER 4 - checks if this edge exists in graph
+    public static boolean isEdge(HashMap<Character, List<Character>> graph, 
+    String edge){
+        Character vertex1 = edge.charAt(0);
+        Character vertex2 = edge.charAt(1);
+        for(Character adj : graph.get(vertex1)){
+            if(adj.equals(vertex2)){
+                return true;
+            }
+        }
+        return false;
+    }
+
+    // HELPER 5 - produces a random starting state with 50% chance for each vertex in graph
+    public static String getRandomState(HashMap<Character, Integer> vertices){
+        // to construct state
+        String randomState = "";
+        // for all vertices in graph
+        for (Character vertex : vertices.keySet()){
+            // Math.random() produces values from 0.0 - 1.0
+            if(Math.random() < 0.5){
+                randomState += vertex;
+            }
+            // reject vertex
+            else{
+                continue;
+            }
+        }
+        return randomState;
+    }
+
+    // HELPER 6 - return a list of neighbors to a given state
+    public static List<String> getNeighbors(String state, 
+    HashMap<Character, Integer> vertices){
+        List<String> neighbors = new ArrayList<>();
+        // if state is empty set
+        if (state.trim().length() == 0){
+            for(Character c : vertices.keySet()){
+                neighbors.add(c.toString().trim());
+            }
+        }
+        // if state has a chain of one vertex or more
+        else{
+            // all options to add a vertex not in state already
+            for(Character c : vertices.keySet()){
+                // if vertex c not already in state
+                if(state.indexOf(c)==-1){
+                    String neighbor = state + c.toString().trim();
+                    neighbors.add(neighbor);
+                }
+            }
+            // all options to remove a vertex
+            for(int i = 0; i < state.length(); i++){
+                Character vertex = state.charAt(i);
+                String neighbor = state.replace(vertex.toString().trim(), "").trim();
+                neighbors.add(neighbor);
+            }
+        }
+        return neighbors;
+    }
+
+    // HELPER 7 - calculate total vertices value of state
     public static int calcValue(HashMap<Character, Integer> vertices, String state){
         if(state == null){
             return 0;
@@ -249,13 +402,18 @@ public class Graph {
         }
     }
 
-    // HELPER 3 - format a state (string) for printing
+    // HELPER 6 - format a state (string) for printing
     public static String formatStateForPrint(String state){
+        if (state.length() == 0){
+            return "{} ";
+        }
         String formatState = "";
         for (int i = 0; i < state.length(); i++){
             formatState += state.charAt(i) + " ";
         }
         return formatState;
     }
-
 }
+
+// CITATIONS: 
+//      https://www.geeksforgeeks.org/java-math-random-method-examples/
