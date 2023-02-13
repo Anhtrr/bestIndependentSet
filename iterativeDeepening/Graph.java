@@ -7,6 +7,14 @@ import java.util.HashMap;
 import java.io.File;
 import java.util.Scanner;
 
+/**
+ *  
+ *  Artificial Inteligence - Programming Assignment #1 - Iterative Deepening Implementation
+ *  Professor Ernest Davis
+ *  @author Anh Tran - 2/12/2023
+ *  Due: 2/13/2023 - 11AM (EST)
+ *  
+ */
 public class Graph {
     public static void main(String args[]){
         // data structure to construct graph and vertex
@@ -21,7 +29,6 @@ public class Graph {
             readInput(graph, vertices, commandInfo);
             flag = commandInfo[0];
             targetValue = Integer.parseInt(commandInfo[1]);
-
         } catch (FileNotFoundException e){
             System.err.println("File input.txt was not found!" + 
             " Please make sure it is in the same folder as the source code" +
@@ -29,7 +36,6 @@ public class Graph {
             " 'iterativeDeepening' folder in your terminal!");
             System.exit(0);
         }
-
         // Verbose Option
         if (flag.equals("V")){
             verbose(graph, vertices, targetValue);

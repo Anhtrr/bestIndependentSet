@@ -10,6 +10,14 @@ import java.io.File;
 import java.util.Scanner;
 import java.lang.Math;
 
+/**
+ *  
+ *  Artificial Inteligence - Programming Assignment #1 - Hill Climbing Implementation
+ *  Professor Ernest Davis
+ *  @author Anh Tran - 2/12/2023
+ *  Due: 2/13/2023 - 11AM (EST)
+ *  
+ */
 public class Graph {
     public static void main(String args[]){
         // data structure to construct graph and vertex
@@ -34,7 +42,6 @@ public class Graph {
             " 'hillClimbing' folder in your terminal!");
             System.exit(0);
         }
-
         // Verbose Option
         if (flag.equals("V")){
             verbose(graph, vertices, targetValue, restarts);
@@ -104,19 +111,22 @@ public class Graph {
         for (int i = 0 ; i < randomCount; i++){
             String randomState = "";
             randomState = getRandomState(vertices);
-            
             // START STATE FORMATTING 
             String formatStartState = formatStateForPrint(randomState);
             int startValue = calcValue(vertices, randomState);
             int startError = calcError(graph, vertices, randomState, goal);
             String formatStartLine = formatStartState + "Value=" + startValue 
             + ". " + "Error=" + startError + ".";
-            
             // PRINT START STATES
             System.out.println("\nRandomly chosen start state: " + 
             formatStartState.trim());
             System.out.println(formatStartLine);
-            
+            // if random state is a solution
+            if(startError == 0){
+                String startAnswerLine = formatStartState + "Value=" ;
+                System.out.println("\nFound solution " + startAnswerLine + startValue + ".");
+                break;
+            }
             String ans = hc(graph, vertices, goal, randomCount, randomState, 'V');
             // if error value = 0
             int finalError = calcError(graph, vertices, ans, goal);
@@ -142,19 +152,16 @@ public class Graph {
         for (int i = 0 ; i < randomCount; i++){
             String randomState = "";
             randomState = getRandomState(vertices);
-            
             // START STATE FORMATTING 
             String formatStartState = formatStateForPrint(randomState);
             int startValue = calcValue(vertices, randomState);
             int startError = calcError(graph, vertices, randomState, goal);
             String formatStartLine = formatStartState + "Value=" + startValue 
             + ". " + "Error=" + startError + ".";
-            
             // PRINT START STATES
             System.out.println("\nRandomly chosen start state: " + 
             formatStartState.trim());
             System.out.println(formatStartLine);
-            
             String ans = hc(graph, vertices, goal, randomCount, randomState, 'C');
             // if error value = 0
             int finalError = calcError(graph, vertices, ans, goal);
@@ -178,16 +185,13 @@ public class Graph {
     HashMap<Character, Integer> vertices, int goal, int randomCount, 
     String startingState, Character flag){
         String state = new String(startingState);
-        
         while (true){
             List<String> neighbors = new ArrayList<>();
             neighbors = getNeighbors(state, vertices);
-            
             // choose optimal N out of all Ns based on error calculation
             String chosenN = chooseN(graph, vertices, neighbors, goal);
             int chosenError = calcError(graph, vertices, chosenN, goal);
             int startingError = calcError(graph, vertices, state, goal);
-             
             // Verbose printing
             if(flag.equals('V')){
                 System.out.println("Neighbors:");
@@ -201,7 +205,6 @@ public class Graph {
                     + ". Error=" + startError + ".";
                     // print neighbor
                     System.out.println(formatPrintLine);
-
                     if(startError == 0){
                         return neighbor;
                     }
@@ -256,7 +259,6 @@ public class Graph {
     HashMap<Character, Integer> vertices, String state, int T){
         // 1) TOTAL VALUE OF VERTICES IN STATE
         int valueTotal = calcValue(vertices, state);
-        
         // empty state
         if(state.length() == 0){
             return T;
@@ -281,10 +283,8 @@ public class Graph {
                         // no duplicate edges
                         char[] edge = {verticesInState[i], verticesInState[j]};
                         Arrays.sort(edge);
-                        
                         if(isEdge(graph, new String(edge))){
                             edges.add(new String(edge));
-                            
                         }
                     }
                 }
@@ -294,12 +294,9 @@ public class Graph {
                 int cost = calcEdgeCost(vertices, edge);
                 edgeCostSum += cost;
             }
-
             // 4) Compare to get max value
             int cmpSum = T - valueTotal;
-            
-            
-            // 4) return max(cmpSum, 0)
+            // 5) return max(cmpSum, 0)
             if (cmpSum>0){
                 return cmpSum + edgeCostSum;
             }
