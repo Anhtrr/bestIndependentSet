@@ -56,5 +56,5 @@ javac hillClimbing.java
                      
                        
 ```
-java Graph.java
+java hillClimbing.java
 ```          
