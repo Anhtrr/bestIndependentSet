@@ -1,7 +1,8 @@
 # ARTIFICIAL INTELLIGENCE - SPRING 23
               
 ### 👨‍🏫 : Professor Ernest Davis                     
-### 👨‍🎓 : Anh Tran 
+### 👨‍🎓 : Anh Tran            
+### ⏰ : 2 / 13 / 23
                   
 ## Best Independent Set Assignment
                
