@@ -18,7 +18,7 @@
          
                 
 ### ✔️ Compiling/Running Instructions                   
-<br>
+
 ####    1)   Iterative Deepening                    
 
 <p align="left"> 
@@ -36,7 +36,7 @@ Make sure that 'Graph.java' has compiled successfully (There now exists a 'Graph
 ```
 java Graph.java
 ```
-<br>
+                        
 ####    2)   Hill Climbing                    
 
 <p align="left"> 
