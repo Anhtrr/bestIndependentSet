@@ -4,7 +4,6 @@ Student: Anh Tran
                   
 ## ⚙️ Best Independent Set Assignment
              
-<p align="center"> 
 .     📁bestIndependentSet📁 ---> 📁hillClimbing📁 ---> 🗀Graph.java🗀           .<br>
 .                              |                      |                            .<br>
 .                              |                      --> 🗀input.txt🗀            .<br>
@@ -12,4 +11,3 @@ Student: Anh Tran
 .                              --> 📁iterativeDeepening📁 ---> 🗀Graph.java🗀     .<br>
 .                                                           |                      .<br>
 .                                                           --> 🗀input.txt🗀      .<br>
-</p>
