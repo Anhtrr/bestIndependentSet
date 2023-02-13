@@ -241,6 +241,9 @@ public class hillClimbing {
         List<Integer> errorValues = new ArrayList<>();
         String chosen = "";
         int chosenIndex = 0;
+        if(graph.size() == 0 && vertices.size() == 0){
+            return chosen;
+        }
         // calculate all error values
         for (String neighbor : neighbors){
             int errorValue = calcError(graph, vertices, neighbor, goal);

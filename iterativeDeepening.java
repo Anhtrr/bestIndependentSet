@@ -250,5 +250,4 @@ public class iterativeDeepening {
         }
         return formatState;
     }
-
 }
