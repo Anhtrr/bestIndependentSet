@@ -16,7 +16,9 @@
                                                       --> 🗀input.txt🗀 <br>
 </pre>   
          
-### ✔️ Compiling/Running Instructions
+                
+### ✔️ Compiling/Running Instructions                   
+
 #### Iterative Deepening
 <p align="center"> 
 Make sure that in your terminal you have navigated to the 'iterativeDeepening' folder. Then, to COMPILE:
