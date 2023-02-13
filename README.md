@@ -3,7 +3,7 @@
 Student: Anh Tran 
                   
 ## ⚙️ Best Independent Set Assignment
-<pre align="center">             
+<pre align="left">             
 📁bestIndependentSet📁 ---> 📁hillClimbing📁 ---> 🗀Graph.java🗀      <br>
                          |                      |                       <br>
                          |                      --> 🗀input.txt🗀       <br>
