@@ -37,7 +37,7 @@ Make sure that 'Graph.java' has compiled successfully (There now exists a 'Graph
 java Graph.java
 ```
 <br>
-####    1)   Hill Climbing                    
+####    2)   Hill Climbing                    
 
 <p align="left"> 
 Make sure that in your terminal you have navigated to the 'hillClimbing' folder. Then, to COMPILE:
