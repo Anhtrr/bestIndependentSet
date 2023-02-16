@@ -92,6 +92,7 @@ public class iterativeDeepening {
                 Character vertex2 = currentLine.split(" ", -1)[1].charAt(0);
                 graph.get(vertex1).remove(vertex2);
                 graph.get(vertex2).remove(vertex1);
+                
             }
             inFile.close();
         } catch (FileNotFoundException e) {
@@ -114,6 +115,7 @@ public class iterativeDeepening {
         for (int currentDepth = 1; currentDepth <= maximalDepth; currentDepth++){
             // print depth level
             System.out.println("\nDepth=" + currentDepth + ".");
+            // EACH DEPTH
             String answer = "";
             answer = dfs( answer, graph, vertices, goal, currentDepth, 'V');
             // IF SOLUTION FOUND
@@ -136,17 +138,12 @@ public class iterativeDeepening {
 
     // COMPACT PRINTING
     public static void compact(HashMap<Character, List<Character>> graph, HashMap<Character, Integer> vertices, int goal){
-        // depth is bounded by n (for n vertices) - From hwk
         int maximalDepth = vertices.size();
         boolean foundSolution = false;
-        // loop through each depth (skip 0 --> based on sample output)
         for (int currentDepth = 1; currentDepth <= maximalDepth; currentDepth++){
-            // store answer
             String answer = "";
             answer = dfs( answer, graph, vertices, goal, currentDepth, 'C');
-            // IF SOLUTION FOUND
-            if(calcValue(vertices, answer)>=goal){
-                // format print
+            if(calcValue(vertices, answer) >= goal){
                 String formatAnswer = formatStateForPrint(answer);
                 String formatAnswerLine = formatAnswer + "Value=" 
                 + calcValue(vertices, answer) + ".";
@@ -155,7 +152,6 @@ public class iterativeDeepening {
                 break;
             }
         }
-        // NO SOLUTION FOUND
         if (foundSolution == false){
             System.out.println("\nNo solution found\n");
         }
@@ -171,30 +167,21 @@ public class iterativeDeepening {
             String formatStateLine = formatState + "Value=" + calcValue(vertices, state) + ".";
             System.out.println(formatStateLine);
         }
-        // BC1 - check for goal state
-        if(calcValue(vertices, state)>= goal){
+        // BC 1 - if goalstate met
+        if (calcValue(vertices, state) >= goal){
             return state;
         }
-        // find successors to current state for # of depths iterations
-        for (int i = 0; i < maxDepth; i++){
-            List<String> successors = new ArrayList<>();
-            successors = getSuccessors(state, graph);
-            // BC2 - if no successors
-            if (successors.size() == 0){
-                return null;
-            }
-            for (String successor : successors){
-                //dfs1(successor)
+        else if (maxDepth > 0){
+            List<String> successors = getSuccessors(state, graph);
+            // for each successor 
+            for (String successor : successors){                
+                // recursion minus maxDepth 
                 String ans = dfs(successor, graph, vertices, goal, maxDepth-1, flag);
-                // if ans meets goal
-                if (calcValue(vertices, ans) >= goal){
+                if (ans != null){
                     return ans;
                 }
             }
-            // FAIL
-            return null;
         }
-        // FAIL
         return null;
     }
 
@@ -211,12 +198,23 @@ public class iterativeDeepening {
         }
         // if not starting state
         else{
-            // for each vertex adjacent to current state's last vertex 
-            for(Character c : graph.get(state.charAt(state.length()-1))){
-                // if vertex isnt already in chain
-                if(!state.contains(c.toString().trim())){
-                    // add to successors
-                    String successor = state + c.toString().trim();
+            Character firstVertexInState = state.charAt(0);
+            List<Character> firstVertexAdj = graph.get(firstVertexInState);
+            // for each adjVertex to first vertex of state
+            for (Character adjVertex : firstVertexAdj){
+                boolean valid = true;
+                // for every other vertex in state
+                for (int i = 1; i < state.length(); i++){
+                    // if adjVertex is already in state
+                    if((state.contains(adjVertex.toString())) || 
+                    // or if adjVertex has edge to other vertices in state
+                    (!graph.get(state.charAt(i)).contains(adjVertex))){
+                        valid = false;
+                        break;
+                    }
+                }
+                if(valid == true){
+                    String successor = state + adjVertex.toString().trim();
                     successors.add(successor);
                 }
             }
